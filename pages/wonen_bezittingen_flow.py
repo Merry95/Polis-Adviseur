@@ -51,23 +51,59 @@ if st.session_state.step_wb == 1 and len(st.session_state.messages_wb) == 0:
 
 
 
+
+
+
 elif st.session_state.step_wb == 5:
-    bot_message("Neemt u deel aan risicovolle activiteiten? (bijvoorbeeld extreme sporten) Antwoord met: ja / nee")
+    bot_message("De glasverzekering is afgerond ✅. We gaan nu verder met de aansprakelijkheidsverzekering.\n\n"
+                "Heeft u een aansprakelijkheidsverzekering? Antwoord met: ja / nee.")
     st.session_state.step_wb = 6
     st.rerun()
 
 
-elif st.session_state.step_wb == 7:
 
-    woonSituatie = st.session_state.get("woonSituatie")
 
-    if woonSituatie == "Koopwoning":
-        bot_message("Woningverzekering: Essentieel bij koopwoning.")
-    else:
-        bot_message("Woningverzekering: Optioneel bij huurwoning.")
 
-    st.session_state.step_wb = 100  # echte eindstatus
+#elif st.session_state.step_wb == 7:
+#    woonSituatie = st.session_state.get("woonSituatie")
+#    if woonSituatie == "Koopwoning":
+#        bot_message("Woningverzekering: Essentieel bij koopwoning.")
+#    else:
+#        bot_message("Woningverzekering: Optioneel bij huurwoning.")
+#    st.session_state.step_wb = 100  # echte eindstatus
+#    st.rerun()
+
+    # ----------------------------
+    # ALGEMEEN ADVIES
+    # ----------------------------
+elif st.session_state.step_wb == 100:
+
+    # Verzamel alle keuzes
+    keuzes = st.session_state.choices
+    advies_lijst = []
+
+    if "type_inboedel" in keuzes:
+        advies_lijst.append(f"Inboedelverzekering: {keuzes['type_inboedel']}")
+    if "glas_verzekering" in keuzes:
+        advies_lijst.append(f"Glasverzekering: {keuzes['glas_verzekering']}")
+    if "aansprakelijkheidverzekering" in keuzes:
+        advies_lijst.append(f"Aansprakelijkheidsverzekering: {keuzes['aansprakelijkheidverzekering']}")
+    if "woonSituatie" in st.session_state:
+        if st.session_state.woonSituatie == "Koopwoning":
+            advies_lijst.append("Woningverzekering: Essentieel")
+        else:
+            advies_lijst.append("Woningverzekering: Optioneel")
+
+    # Toon alles in 1 bericht
+    algemeen_advies = "✅ Algemeen advies gebaseerd op uw antwoorden:\n\n" + "\n".join(advies_lijst)
+    bot_message(algemeen_advies)
+
+    st.session_state.step_wb = 101  # einde flow
     st.rerun()
+
+
+
+
 
 
 
@@ -115,17 +151,23 @@ if user_input:
             woonSituatie = st.session_state.get("woonSituatie")
             bot_message(
                 f"👍 Dank je! Je inboedel wordt geschat op €{waarde:,}. "
-                f"Adviescategorie: {type_inboedel}.{woonSituatie}"
+                #f"Adviescategorie: {type_inboedel}.{woonSituatie}"
             )
 
             # 👉 NU GLAS-VRAAG
             if woonSituatie == "Koopwoning":
+                st.session_state.choices["opstalverzekering"] = "essentieel"
                 bot_message(
-                    "Heeft u veel of speciaal glas (bijvoorbeeld een serre of glas-in-lood)? Antwoord met: ja / nee"
+                    "Goed, dan gaan we nu kijken naar uw glasverzekering 👇\n\n"
+                    "U heeft aangegeven dat u een koopwoning heeft. Daarom bekijken we of een glasverzekering voor u nodig is.\n\n"
+                    "Heeft u veel of speciaal glas (bijvoorbeeld een serre of glas-in-lood)? Antwoord alstublieft met: ja / nee."
                 )
                 st.session_state.step_wb = 3
             else:
+                st.session_state.choices["opstalverzekering"] = "optioneel"
                 bot_message(
+                    "Goed, dan gaan we nu kijken naar uw glasverzekering 👇\n\n"
+                    "U heeft aangegeven dat u geen koopwoning heeft. Daarom willen we nog even uw type woning controleren in verband met de glasverzekering. \n\n"
                     "Wat voor type woning heeft u? appartement / eensgezinswoning / overig"
                 )
                 st.session_state.step_wb = 4
@@ -140,18 +182,21 @@ if user_input:
     # STAP 3 → Glas verwerken
     # ----------------------------
 
+
+
+
     elif st.session_state.step_wb == 3:
 
         if antwoord in ["ja", "nee"]:
 
-            st.session_state.choices["speciaal_glas"] = antwoord
-
             if antwoord == "ja":
-                glas_verzekering= "essentiële glasverzekering"
-                bot_message("👍 We adviseren een essentiële glasverzekering.")
+                glas_verzekering = "essentiële glasverzekering"
+            else:
+                glas_verzekering = "geen aanvullende glasverzekering nodig"
 
+            st.session_state.choices["glas_verzekering"] = glas_verzekering
 
-            st.session_state.step_wb = 5  # einde subflow
+            st.session_state.step_wb = 5
 
         else:
             bot_message("Kies alstublieft: ja / nee")
@@ -174,7 +219,7 @@ if user_input:
 
             st.session_state.choices["glas_verzekering"] = glas_verzekering
 
-            bot_message(f"Advies: {glas_verzekering}")
+            #bot_message(f"Advies: {glas_verzekering}")
 
             st.session_state.step_wb = 5
 
@@ -193,24 +238,18 @@ if user_input:
 
         if antwoord in ["ja", "nee"]:
 
-            st.session_state.choices["risicovolle_activiteiten"] = antwoord
-
             if antwoord == "ja":
-                advies = "Essentiële aansprakelijkheidsverzekering"
-                bot_message("⚠️ Advies: Essentiële aansprakelijkheidsverzekering.")
-            else:
-                advies = (
-                    "Aansprakelijkheidsverzekering:\n\n"
-                    "Essentieel: kinderen en/of dieren\n\n"
-                    "Aanbevolen: samenwonend\n\n"
-                    "Optioneel: alleenstaand"
+                advies = "U heeft al een aansprakelijkheidsverzekering."
+                st.session_state.choices["aansprakelijkheidverzekering"] = advies
+                bot_message("Goed om te horen dat u verzekerd bent ✅")
+                st.session_state.step_wb = 7  # door naar volgende hoofdstap
+
+            else:  # nee
+                bot_message(
+                    "Kunt u bij een grote schadeclaim (bijvoorbeeld €50.000) "
+                    "dit bedrag zelf betalen? Antwoord met: ja / nee."
                 )
-                bot_message(advies)
-
-            # Opslaan
-            st.session_state.choices["aansprakelijkheidverzekering"] = advies
-
-            st.session_state.step_wb = 7  # Ga naar volgende stap
+                st.session_state.step_wb = 8  # NIEUWE tussenstap
 
         else:
             bot_message("Antwoord met ja of nee.")
@@ -218,14 +257,56 @@ if user_input:
         st.rerun()
 
 
-    elif st.session_state.step_wb == 7:
 
-        woonSituatie = st.session_state.get("woonSituatie")
 
-        if woonSituatie == "Koopwoning":
-            bot_message("Woningverzekering: Essentieel bij koopwoning.")
+    elif st.session_state.step_wb == 8:
+
+        if antwoord in ["ja", "nee"]:
+
+            if antwoord == "ja":
+                advies = "Aansprakelijkheidsverzekering: optioneel."
+                #bot_message("Op basis van uw antwoord is een aansprakelijkheidsverzekering optioneel.")
+                st.session_state.choices["aansprakelijkheidverzekering"] = advies
+                st.session_state.step_wb = 7
+
+            else:  # kan NIET zelf betalen
+                st.session_state.step_wb = 9
+
         else:
-            bot_message("Woningverzekering: Optioneel bij huurwoning.")
+            bot_message("Antwoord met ja of nee.")
 
-        st.session_state.step_wb = 100  # echte eindstatus
         st.rerun()
+
+
+
+
+
+elif st.session_state.step_wb == 9:
+
+    gezin = st.session_state.get("gezinssituatie", "").lower()
+
+    if gezin in ["kinderen", "huisdieren"]:
+        advies = "Aansprakelijkheidsverzekering: essentieel."
+    elif gezin == "alleen":
+        advies = "Aansprakelijkheidsverzekering: aanbevolen."
+    else:
+        advies = "Aansprakelijkheidsverzekering: optioneel."
+
+    #bot_message(f"Advies: {advies}")
+
+    st.session_state.choices["aansprakelijkheidverzekering"] = advies
+    st.session_state.step_wb = 7
+    st.rerun()
+
+
+
+
+
+
+elif st.session_state.step_wb == 7:
+
+    bot_message("We gaan nu naar het algemeen advies overzicht.")
+    st.session_state.step_wb = 100
+    st.rerun()
+
+
