@@ -69,7 +69,11 @@ if st.session_state.step == 1 and len(st.session_state.messages) == 0:
     bot_message(
         "Welkom 👋"
         "We gaan beginnen met enkele vragen. U kunt antwoorden met: ja / nee. \n\n "
-        "Heeft u wonen & bezittingen verzekeringen?\n"
+        "Herkent u één van de 'wonen & bezittingen verzekeringen' niet?\n" \
+        "• Inboedelverzekering \n" \
+        "• Aansprakelijkheidsverzekering\n" \
+        "• Opstalverzekering\n" \
+        "• Glasverzekering\n"
     )
     st.session_state.step = 2
     st.rerun()
