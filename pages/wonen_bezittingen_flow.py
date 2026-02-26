@@ -72,11 +72,11 @@ def handle_inboedel(user_input):
         if waarde <= 500:
             type_inboedel = "geen inboedelverzekering"
         elif waarde <= 5000:
-            type_inboedel = "optionele inboedelverzekering"
+            type_inboedel = "Optioneel"
         elif waarde <= 10000:
-            type_inboedel = "aanbevolen inboedelverzekering"
+            type_inboedel = "Aanbevolen"
         else:
-            type_inboedel = "essentiële inboedelverzekering"
+            type_inboedel = "Essentieel"
 
         st.session_state.choices["type_inboedel"] = type_inboedel
 
@@ -123,7 +123,7 @@ def handle_glas_koop(antwoord):
     if antwoord in ["ja", "nee"]:
 
         if antwoord == "ja":
-            glas_verzekering = "essentiële glasverzekering"
+            glas_verzekering = "Essentieel."
         else:
             glas_verzekering = "geen aanvullende glasverzekering nodig"
 
@@ -143,9 +143,9 @@ def handle_glas_huur(antwoord):
     if antwoord in ["appartement", "eensgezinswoning", "overig"]:
 
         if antwoord == "appartement":
-            glas_verzekering = "optionele glasverzekering"
+            glas_verzekering = "Optioneel."
         elif antwoord == "eensgezinswoning":
-            glas_verzekering = "aanbevolen glasverzekering"
+            glas_verzekering = "Aanbevolen"
         else:
             glas_verzekering = "geen glasverzekering nodig"
 
@@ -204,9 +204,9 @@ def handle_schadevraag(antwoord):
     if antwoord in ["ja", "nee"]:
 
         if antwoord == "ja":
-            advies = "Aansprakelijkheidsverzekering: optioneel."
+            advies = "optioneel."
         else:
-            advies = "Aansprakelijkheidsverzekering: essentieel."
+            advies = "essentieel."
 
         st.session_state.choices["aansprakelijkheidverzekering"] = advies
         st.session_state.step_wb = 7
