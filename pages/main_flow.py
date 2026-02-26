@@ -6,8 +6,6 @@ st.set_page_config(page_title="Verzekering Chatbot")
 st.title("🤖 Verzekering Advies Chatbot")
 
 
-
-
 # ----------------------------
 # SESSION STATE INITIALISATIE
 # ----------------------------
@@ -66,15 +64,7 @@ def bot_message(text, min_delay=0.001, max_delay=0.005):
 # ----------------------------
 
 if st.session_state.step == 1 and len(st.session_state.messages) == 0:
-    bot_message(
-        "Welkom 👋"
-        "We gaan beginnen met enkele vragen. U kunt antwoorden met: ja / nee. \n\n "
-        "Herkent u één van de 'wonen & bezittingen verzekeringen' niet?\n" \
-        "• Inboedelverzekering \n" \
-        "• Aansprakelijkheidsverzekering\n" \
-        "• Opstalverzekering\n" \
-        "• Glasverzekering\n"
-    )
+    bot_message("Welkom 👋\n We gaan beginnen met enkele vragen. U kunt antwoorden met: ja / nee. \n\n Herkent u alle 'wonen & bezittingen verzekeringen'? \n\n• Inboedelverzekering\n\n• Aansprakelijkheidsverzekering\n\n• Opstalverzekering\n\n• Glasverzekering\n")
     st.session_state.step = 2
     st.rerun()
 
@@ -106,7 +96,7 @@ if user_input:
             st.switch_page("pages/wonen_bezittingen_flow.py")
 
         elif antwoord == "ja":
-            bot_message("Heeft u Persoon & Gezin verzekeringen?", 1.2, 2)
+            bot_message("Heeft u Persoon & Gezin verzekeringen? \n\n Herkent u één van de 'Persoon & Gezin verzekeringen' niet? \n\n • Zorgverzekering (basis/aanvullend)\n\n • Overlijdensrisicoverzekering\n\n • Uitvaartverzekering\n\n • Glasverzekering\n", 1.2, 2)
             st.session_state.step = 3
 
         else:
